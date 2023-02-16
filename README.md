@@ -4,12 +4,14 @@ The simplest possible Swift library for handling HTTP requests:
 1. Async/Await interface
 1. Uses `Result`
 1. Uses `Decodable`
-1. Easy request body and url encoded params 
-1. Can intercept requests to mock response 
+1. Can get both `Data` and `Decodable` as result
+1. Easy syntax 
+1. Integrated mocking 
 
 ## Examples
 
 ### Drop-In URLSession replacement
+This is taken directly from [this test case](https://github.com/curzel-it/BareBones/blob/main/Tests/BareBonesTests/RandomUsersTests.swift).
 ```swift
 let client = HttpClient(baseUrl: {domain})
 let response: Result<{DecodableResponse}, ApiError> = await client.get(from: {endpoint}, with: {params})
@@ -21,6 +23,7 @@ case .failure: // Handle any error
 ```
 
 ### API Client
+This is taken directly from [this test case](https://github.com/curzel-it/BareBones/blob/main/Tests/BareBonesTests/RandomUsersTests.swift).
 ```swift
 func fetchRandomUsers() async {
     let api = RandomUsersApi()
@@ -57,6 +60,7 @@ private struct RandomUserName: Codable {
 ```
 
 ### Mock response
+This is taken directly from [this test case](https://github.com/curzel-it/BareBones/blob/main/Tests/BareBonesTests/InterceptorsTests.swift).
 ```swift    
 let interceptor = Interceptor(when: .urlContains("google.com"), return: .failure(.noData))
 HttpClient.add(interceptor: interceptor)
