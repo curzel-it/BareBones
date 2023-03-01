@@ -1,14 +1,16 @@
 import Foundation
 
 public class HttpClient {
+    public var logResponses: Bool
     private let requestBuilder: RequestBuilder
     
     public var httpHeaders: [String: String] = [
         "Content-Type": "application/json"
     ]
     
-    public init(baseUrl: String) {
+    public init(baseUrl: String, logResponses: Bool = false) {
         requestBuilder = RequestBuilder(baseUrl: baseUrl)
+        self.logResponses = logResponses
     }
     
     public func data(
@@ -47,6 +49,10 @@ public class HttpClient {
     }
     
     private func handle<T: Decodable>(responseData data: Data) -> Result<T, ApiError> {
+        if logResponses {
+            let string = String(data: data, encoding: .utf8) ?? "<unreadable>"
+            print("\(Date()) [BareBones] Response: \(string)")
+        }
         do {
             let result = try JSONDecoder().decode(T.self, from: data)
             return .success(result)

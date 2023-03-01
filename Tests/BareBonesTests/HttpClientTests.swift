@@ -13,7 +13,7 @@ final class HttpClientTests: XCTestCase {
         
         HttpClient.add(interceptor: Interceptor(when: .always, return: expectedFruits))
         
-        let api = HttpClient(baseUrl: testUrl)
+        let api = HttpClient(baseUrl: testUrl, logResponses: true)
         let result: Result<[Fruit], ApiError> = await api.get(with: [:])
         
         switch result {
@@ -26,7 +26,7 @@ final class HttpClientTests: XCTestCase {
         let expectedFruits = [Fruit(name: "Apple"), Fruit(name: "Banana"), Fruit(name: "Cherry")]
         HttpClient.add(interceptor: Interceptor(when: .always, return: expectedFruits))
                 
-        let api = HttpClient(baseUrl: testUrl)
+        let api = HttpClient(baseUrl: testUrl, logResponses: true)
         let result: Result<[Animal], ApiError> = await api.get(with: [:])
         
         switch result {
@@ -39,7 +39,7 @@ final class HttpClientTests: XCTestCase {
         let expectedData = "Hello World!".data(using: .utf8)!
         HttpClient.add(interceptor: Interceptor(when: .always, return: expectedData))
                 
-        let api = HttpClient(baseUrl: testUrl)
+        let api = HttpClient(baseUrl: testUrl, logResponses: true)
         let result = await api.data(via: .get)
         
         switch result {
