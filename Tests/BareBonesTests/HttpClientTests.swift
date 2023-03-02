@@ -14,7 +14,7 @@ final class HttpClientTests: XCTestCase {
         HttpClient.add(interceptor: Interceptor(when: .always, return: expectedFruits))
         
         let api = HttpClient(baseUrl: testUrl, logResponses: true)
-        let result: Result<[Fruit], ApiError> = await api.get(with: [:])
+        let result: Result<[Fruit], Error> = await api.get(with: [:])
         
         switch result {
         case .success(let fruits): XCTAssertEqual(expectedFruits, fruits)
@@ -27,11 +27,11 @@ final class HttpClientTests: XCTestCase {
         HttpClient.add(interceptor: Interceptor(when: .always, return: expectedFruits))
                 
         let api = HttpClient(baseUrl: testUrl, logResponses: true)
-        let result: Result<[Animal], ApiError> = await api.get(with: [:])
+        let result: Result<[Animal], Error> = await api.get(with: [:])
         
         switch result {
         case .success: XCTAssert(false)
-        case .failure(let error): XCTAssertEqual(ApiError.decodingFailed, error)
+        case .failure(let error): XCTAssertEqual(ApiError.decodingFailed, error as? ApiError)
         }
     }
     

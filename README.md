@@ -26,7 +26,7 @@ I use this in production in a couple of personal project, it works just fine.
 This is taken directly from [this test case](https://github.com/curzel-it/BareBones/blob/main/Tests/BareBonesTests/RandomUsersTests.swift).
 ```swift
 let client = HttpClient(baseUrl: {domain})
-let response: Result<{DecodableResponse}, ApiError> = await client.get(from: {endpoint}, with: {params})
+let response: Result<{DecodableResponse}, Error> = await client.get(from: {endpoint}, with: {params})
 
 switch response {
 case .success(let response): // Fetched and decoded, ready for use
@@ -60,7 +60,7 @@ func fetchRandomUsers() async {
 private class RandomUsersApi {
     private let client = HttpClient(baseUrl: "https://randomuser.me")
     
-    func fetchUsers() async -> Result<RandomUsersResponse, ApiError> {
+    func fetchUsers() async -> Result<RandomUsersResponse, Error> {
         await client.get(from: "api", with: ["results": 5])
     }
 }

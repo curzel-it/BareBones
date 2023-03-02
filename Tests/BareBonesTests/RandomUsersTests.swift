@@ -6,7 +6,7 @@ import XCTest
 final class RandomUsersTests: XCTestCase {
     func testGetRandomUsers() async {
         let client = HttpClient(baseUrl: testUrl, logResponses: true)
-        let response: Result<RandomUsersResponse, ApiError> = await client.get(
+        let response: Result<RandomUsersResponse, Error> = await client.get(
             from: "api", with: ["results": 5]
         )
         switch response {
@@ -30,7 +30,7 @@ private let testUrl = "https://randomuser.me"
 private class RandomUsersApi {
     private let client = HttpClient(baseUrl: testUrl, logResponses: true)
     
-    func fetchUsers() async -> Result<RandomUsersResponse, ApiError> {
+    func fetchUsers() async -> Result<RandomUsersResponse, Error> {
         await client.get(from: "api", with: ["results": 5])
     }
 }

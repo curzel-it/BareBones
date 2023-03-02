@@ -15,7 +15,7 @@ extension HttpClient {
         interceptors.removeAll()
     }
     
-    static func intercept(_ request: URLRequest) -> Result<Data, ApiError>? {
+    static func intercept(_ request: URLRequest) -> Result<Data, Error>? {
         for interceptor in interceptors {
             if let result = interceptor.intercept(request) {
                 return result
@@ -28,11 +28,11 @@ extension HttpClient {
 public struct Interceptor {
     let id: String = UUID().uuidString
     let condition: InterceptorCondition
-    let response: Result<Data, ApiError>
+    let response: Result<Data, Error>
     
     public init(
         when condition: InterceptorCondition,
-        return response: Result<Data, ApiError>
+        return response: Result<Data, Error>
     ) {
         self.condition = condition
         self.response = response
@@ -53,7 +53,7 @@ public struct Interceptor {
         self.init(when: condition, return: .success(data))
     }
     
-    public func intercept(_ request: URLRequest) -> Result<Data, ApiError>? {
+    public func intercept(_ request: URLRequest) -> Result<Data, Error>? {
         condition.matches(request) ? response : nil
     }
 }

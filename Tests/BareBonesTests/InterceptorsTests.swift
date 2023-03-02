@@ -53,10 +53,17 @@ final class InterceptorsTests: XCTestCase {
     }
     
     func testInterceptorCanMakeRequestFail() async throws {
-        let interceptor = Interceptor(when: .urlContains("google.com"), return: .failure(.noData))
+        let interceptor = Interceptor(
+            when: .urlContains("google.com"),
+            return: .failure(ApiError.noData)
+        )
         HttpClient.add(interceptor: interceptor)
         let client = HttpClient(baseUrl: "https://www.google.com")
-        let response = await client.data(via: .get)
-        XCTAssertEqual(.failure(.noData), response)
+        let result = await client.data(via: .get)
+        
+        switch result {
+        case .success: XCTAssert(false)
+        case .failure(let error): XCTAssertEqual(ApiError.noData, error as? ApiError)
+        }
     }
 }

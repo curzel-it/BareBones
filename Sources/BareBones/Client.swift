@@ -17,7 +17,7 @@ public class HttpClient {
         via method: HttpMethod,
         to path: String = "",
         with content: RequestContent = .empty
-    ) async -> Result<Data, ApiError> {
+    ) async -> Result<Data, Error> {
         do {
             let request = try requestBuilder.buildRequest(
                 via: method,
@@ -32,11 +32,11 @@ public class HttpClient {
             return await withCheckedContinuation { continuation in
                 URLSession.shared.dataTask(with: request) { data, _, error in
                     guard error == nil else {
-                        continuation.resume(returning: .failure(.requestFailed))
+                        continuation.resume(returning: .failure(ApiError.requestFailed))
                         return
                     }
                     guard let data else {
-                        continuation.resume(returning: .failure(.noData))
+                        continuation.resume(returning: .failure(ApiError.noData))
                         return
                     }
                     continuation.resume(returning: .success(data))
@@ -48,7 +48,7 @@ public class HttpClient {
         }
     }
     
-    private func handle<T: Decodable>(responseData data: Data) -> Result<T, ApiError> {
+    private func handle<T: Decodable>(responseData data: Data) -> Result<T, Error> {
         if logResponses {
             let string = String(data: data, encoding: .utf8) ?? "<unreadable>"
             print("\(Date()) [BareBones] Response: \(string)")
@@ -58,25 +58,25 @@ public class HttpClient {
             return .success(result)
         } catch let error {
             print("\(Date()) [BareBones] Decoding failed! \(error)")
-            return .failure(.decodingFailed)
+            return .failure(ApiError.decodingFailed)
         }
     }
 }
 
 public extension HttpClient {
-    func get<T: Decodable>(from path: String = "", with params: [String: Any]=[:]) async -> Result<T, ApiError> {
+    func get<T: Decodable>(from path: String = "", with params: [String: Any]=[:]) async -> Result<T, Error> {
         await run(via: .get, to: path, with: .url(params: params))
     }
     
-    func getData(from path: String = "", with params: [String: Any]=[:]) async -> Result<Data, ApiError> {
+    func getData(from path: String = "", with params: [String: Any]=[:]) async -> Result<Data, Error> {
         await data(via: .get, to: path, with: .url(params: params))
     }
     
-    func post<T: Decodable>(to path: String = "", with content: any Encodable) async -> Result<T, ApiError> {
+    func post<T: Decodable>(to path: String = "", with content: any Encodable) async -> Result<T, Error> {
         await run(via: .post, to: path, with: .body(body: content))
     }
     
-    func put<T: Decodable>(to path: String = "", with content: any Encodable) async -> Result<T, ApiError> {
+    func put<T: Decodable>(to path: String = "", with content: any Encodable) async -> Result<T, Error> {
         await run(via: .put, to: path, with: .body(body: content))
     }
 }
@@ -86,7 +86,7 @@ private extension HttpClient {
         via method: HttpMethod,
         to path: String = "",
         with content: RequestContent = .empty
-    ) async -> Result<T, ApiError> {
+    ) async -> Result<T, Error> {
         let response = await data(via: method, to: path, with: content)
         switch response {
         case .success(let data): return handle(responseData: data)
