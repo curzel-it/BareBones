@@ -2,14 +2,16 @@ import Foundation
 
 public class HttpClient {
     public var logResponses: Bool
+    private let session: URLSession
     private let requestBuilder: RequestBuilder
     
     public var httpHeaders: [String: String] = [
         "Content-Type": "application/json"
     ]
     
-    public init(baseUrl: String, logResponses: Bool = false) {
+    public init(baseUrl: String, logResponses: Bool = false, session: URLSession = .shared) {
         requestBuilder = RequestBuilder(baseUrl: baseUrl)
+        self.session = session
         self.logResponses = logResponses
     }
     
@@ -30,7 +32,7 @@ public class HttpClient {
             }
             
             return await withCheckedContinuation { continuation in
-                URLSession.shared.dataTask(with: request) { data, _, error in
+                session.dataTask(with: request) { data, _, error in
                     guard error == nil else {
                         continuation.resume(returning: .failure(ApiError.requestFailed))
                         return
